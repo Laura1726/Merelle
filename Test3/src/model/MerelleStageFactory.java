@@ -13,10 +13,6 @@ import boardifier.model.TextElement;
  *  - 9 black Pawn instances in the black pot (row 0, columns 0..8)
  *  - 9 white Pawn instances in the white pot (row 0, columns 0..8)
  *  - 1 TextElement showing the current player name at (0, 0)
- *
- * API note: the constructor receives MerelleStageModel directly and passes it
- * to super(). All elements are created with stageModel as their GameStageModel
- * argument — there is no separate gameStageModel variable (confirmed by PuissanceXStageFactory).
  */
 public class MerelleStageFactory extends StageElementsFactory {
 

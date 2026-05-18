@@ -22,24 +22,16 @@ import java.util.List;
  * row 5:      [18]      [19]      [20]
  * row 6: [21]           [22]           [23]
  *
- * Position indices 0..23 map to (row, col) via POS_TO_ROWCOL.
- * Adjacency and mill definitions follow the standard Nine Men's Morris rules.
  */
 public class MerelleBoard extends ContainerElement {
 
     public static final String BOARD_NAME = "merelboard";
     private static final int BOARD_TYPE_ID = 52;
 
-    // Register element type once at class-loading time (same pattern as PuissanceXBoard)
     static {
         ElementTypes.register(BOARD_NAME, BOARD_TYPE_ID);
     }
 
-    // -----------------------------------------------------------------------
-    // Static board geometry
-    // -----------------------------------------------------------------------
-
-    /** Maps position index (0..23) to [row, col] in the 7x7 grid. */
     public static final int[][] POS_TO_ROWCOL = {
             {0,0}, {0,3}, {0,6},   //  0  1  2  outer top row
             {1,1}, {1,3}, {1,5},   //  3  4  5  middle top row
@@ -51,7 +43,6 @@ public class MerelleBoard extends ContainerElement {
             {6,0}, {6,3}, {6,6}    // 21 22 23  outer bottom row
     };
 
-    /** Adjacency list: directly connected neighbours for each position. */
     public static final int[][] ADJACENCY = {
             {1, 9},           //  0
             {0, 2, 4},        //  1
@@ -79,7 +70,6 @@ public class MerelleBoard extends ContainerElement {
             {14, 22}          // 23
     };
 
-    /** All 16 possible mills (aligned triples of position indices). */
     public static final int[][] MILLS = {
             // Horizontal lines
             {0, 1, 2},
@@ -101,20 +91,12 @@ public class MerelleBoard extends ContainerElement {
             {2, 14, 23}
     };
 
-    // -----------------------------------------------------------------------
-    // Constructor
-    // -----------------------------------------------------------------------
 
     public MerelleBoard(int x, int y, GameStageModel gameStageModel) {
         super(BOARD_NAME, x, y, 7, 7, gameStageModel);
         this.type = ElementTypes.getType(BOARD_NAME);
     }
 
-    // -----------------------------------------------------------------------
-    // Position conversion utilities
-    // -----------------------------------------------------------------------
-
-    /** Converts a position index (0..23) to [row, col] in the 7x7 grid. */
     public static int[] posToRowCol(int posIndex) {
         return POS_TO_ROWCOL[posIndex];
     }
@@ -130,33 +112,21 @@ public class MerelleBoard extends ContainerElement {
         return -1;
     }
 
-    /** Returns true if (row, col) is a valid board position. */
     public static boolean isValidPosition(int row, int col) {
         return rowColToPos(row, col) != -1;
     }
 
-    // -----------------------------------------------------------------------
-    // Pawn access helpers
-    // -----------------------------------------------------------------------
-
-    /** Returns the Pawn at position index posIndex, or null if empty. */
     public Pawn getPawnAt(int posIndex) {
         int[] rc = POS_TO_ROWCOL[posIndex];
         if (isEmptyAt(rc[0], rc[1])) return null;
         return (Pawn) getElement(rc[0], rc[1]);
     }
 
-    /** Returns true if the position at posIndex is empty. */
     public boolean isEmptyAtPos(int posIndex) {
         int[] rc = POS_TO_ROWCOL[posIndex];
         return isEmptyAt(rc[0], rc[1]);
     }
 
-    // -----------------------------------------------------------------------
-    // reachableCells setters (called by controller to highlight valid moves)
-    // -----------------------------------------------------------------------
-
-    /** PLACEMENT PHASE: marks all empty board positions as reachable. */
     public void setValidCellsForPlacement() {
         resetReachableCells(false);
         for (int i = 0; i < 24; i++) {
@@ -167,10 +137,6 @@ public class MerelleBoard extends ContainerElement {
         }
     }
 
-    /**
-     * MOVEMENT PHASE — select source:
-     * marks all pawns of playerColor that have at least one valid move (or can fly).
-     */
     public void setValidCellsForSelection(int playerColor, boolean canFly) {
         resetReachableCells(false);
         for (int i = 0; i < 24; i++) {
@@ -184,11 +150,7 @@ public class MerelleBoard extends ContainerElement {
         }
     }
 
-    /**
-     * MOVEMENT PHASE — select destination:
-     * marks valid destinations for the pawn at fromPos.
-     * If canFly, all empty cells are valid destinations.
-     */
+
     public void setValidCellsForMove(int fromPos, boolean canFly) {
         resetReachableCells(false);
         if (canFly) {
@@ -208,11 +170,6 @@ public class MerelleBoard extends ContainerElement {
         }
     }
 
-    /**
-     * CAPTURE PHASE: marks opponent pawns that can be captured.
-     * Pawns inside a mill are protected unless ALL opponent pawns are in mills,
-     * in which case any opponent pawn may be captured.
-     */
     public void setValidCellsForCapture(int opponentColor) {
         resetReachableCells(false);
         List<Integer> notInMill = new ArrayList<>();
@@ -231,11 +188,6 @@ public class MerelleBoard extends ContainerElement {
         }
     }
 
-    // -----------------------------------------------------------------------
-    // Game-logic helpers
-    // -----------------------------------------------------------------------
-
-    /** Returns true if the pawn at posIndex has at least one adjacent empty cell. */
     public boolean hasValidMove(int posIndex) {
         for (int neighbour : ADJACENCY[posIndex]) {
             if (isEmptyAtPos(neighbour)) return true;
@@ -243,7 +195,6 @@ public class MerelleBoard extends ContainerElement {
         return false;
     }
 
-    /** Returns true if the pawn at posIndex is part of a completed mill. */
     public boolean isInMill(int posIndex) {
         Pawn p = getPawnAt(posIndex);
         if (p == null) return false;
@@ -289,7 +240,6 @@ public class MerelleBoard extends ContainerElement {
     /**
      * Returns true if placing/moving a pawn of the given color to posIndex forms
      * a mill DIFFERENT from lastMill (the mill this player formed last turn).
-     * Enforces the rule: a player cannot break and immediately re-form the same mill.
      *
      * @param posIndex  destination position
      * @param color     color of the pawn being placed/moved
@@ -305,7 +255,7 @@ public class MerelleBoard extends ContainerElement {
                 if (a == b) { matches++; break; }
             }
         }
-        return matches < 3; // true = different mill = allowed
+        return matches < 3;
     }
 
     /**

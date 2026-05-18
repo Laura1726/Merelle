@@ -25,7 +25,6 @@ public class MerellePawnPot extends ContainerElement {
      * @param gameStageModel  the stage model this element belongs to
      */
     public MerellePawnPot(String name, int x, int y, GameStageModel gameStageModel) {
-        // 1 row, 9 columns — one slot per pawn
         super(name, x, y, 1, 9, gameStageModel);
         this.type = ElementTypes.getType(POT_NAME);
     }
