@@ -1,0 +1,122 @@
+# TEST : Entrées invalides — robustesse du contrôleur
+# Mode : 0 (Human vs Human)
+# Objectif : S'assurer que chaque saisie incorrecte est rejetée proprement
+#            sans planter le jeu, et que la bonne invite est réaffichée.
+#
+# Chaque bloc teste un type d'erreur. Après le rejet, une entrée valide
+# suit pour permettre au jeu de continuer.
+
+# =========================================================
+# PHASE PLACEMENT — saisies invalides
+# =========================================================
+
+# Cas 1 : saisie non numérique
+# Attendu : "Error: enter a number between 0 and 23"
+abc
+# Saisie valide pour avancer
+0
+
+# Cas 2 : nombre hors plage (négatif)
+# Attendu : "Error: enter a number between 0 and 23"
+-1
+# Saisie valide
+23
+
+# Cas 3 : nombre hors plage (> 23)
+# Attendu : "Error: enter a number between 0 and 23"
+99
+# Saisie valide
+1
+
+# Cas 4 : position déjà occupée (0 est déjà pris par Noir)
+# Attendu : "Error: position 0 is already occupied"
+0
+# Saisie valide
+22
+
+# Cas 5 : chaîne vide (juste Entrée) — le jeu doit redemander
+# (ligne vide simulée ci-dessous)
+
+# Saisie valide après ligne vide
+2
+21
+
+# Cas 6 : saisie avec espaces autour — doit être acceptée (trim())
+# "  3  " → équivalent à "3"
+  3  
+20
+
+# Cas 7 : chaîne flottante
+# Attendu : "Error: enter a number between 0 and 23"
+3.5
+# Saisie valide
+4
+14
+
+# =========================================================
+# Placement des pions restants (pour atteindre MOVEMENT)
+# =========================================================
+9
+5
+10
+13
+11
+17
+6
+8
+15
+16
+
+# → PHASE_MOVEMENT
+
+# =========================================================
+# PHASE MOVEMENT — saisies invalides
+# =========================================================
+
+# Cas 8 : sélection d'une case sans pion noir
+# Attendu : "no pawn of yours at position 7"
+7
+# Sélection valide : pion noir en 0
+0
+# Destination invalide : non adjacente à 0 (adj[0]={1,9}) et non libre
+# Cas 9 : destination occupée
+1
+# Attendu : "Error: position 1 is already occupied"
+# Destination invalide : non adjacente
+21
+# Attendu : "cannot move there"
+# Destination valide : adj[0]={1,9} — 9 est occupé, 1 occupé...
+# Les deux adjacents de 0 sont occupés → pion 0 est bloqué
+# Le contrôleur aurait dû refuser la sélection de 0 dès le départ !
+# Annulation et sélection d'un pion non bloqué
+C
+
+# Sélection d'un pion avec mouvement possible
+# Pion en 4 (adj[4]={1,3,5,7} : 3 occupé, 1 occupé, 5 blanc, 7 libre !)
+4
+7
+
+# =========================================================
+# PHASE CAPTURE — saisies invalides
+# =========================================================
+# Pour déclencher une capture, Noir doit former un moulin en déplaçant vers 7
+# Si {4→7} complète {6,7,8} (6 noir, 7 libre→noir, 8 blanc) → NON (8 est blanc)
+# Si {4→7} complète {1,4,7} (1 noir, 4→7 noir, 7) → 1 est noir, mais 4 est parti
+# PAS de moulin ici. Continuer les mouvements normaux.
+
+# Blanc bouge
+# Blanc pion en 22 (adj[22]={19,21,23}) : 21 libre !, 19 libre, 23 occupé
+22
+21
+
+# Pour forcer un test de capture, séquence rapide vers moulin {21,22,23}
+# Noir déplace vers 22 (depuis 7, adj[7]={4,6,8,16} : 4 libre, 6 libre, 8 blanc, 16 libre)
+7
+22
+# Si {21,22,23} → 21 occupé blanc, 22→noir, 23 occupé blanc → NON (couleurs mixtes)
+# Moulin non formé. Continuer.
+
+# Test stop
+stop
+# Attendu : "Game stopped by player." et fin immédiate
+stop

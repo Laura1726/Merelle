@@ -1,0 +1,88 @@
+# TEST : Formation de moulins et captures
+# Mode : 0 (Human vs Human)
+# Objectif : Vérifier la détection de moulin, le déclenchement de PHASE_CAPTURE,
+#            la règle "on ne peut pas capturer un pion en moulin si d'autres existent",
+#            et le retour à la bonne phase après capture.
+#
+# Scénario :
+#   Noir forme le moulin 0-1-2 lors du placement → doit capturer un blanc
+#   Blanc tente de protéger ses pions en formant son propre moulin
+#   Test de la règle : capture d'un pion EN moulin refusée si d'autres disponibles
+
+# ===== PLACEMENT =====
+
+# Tour 1 — Noir : 0 | Blanc : 3
+0
+3
+
+# Tour 2 — Noir : 1 | Blanc : 4
+1
+4
+
+# Tour 3 — Noir : 2  → MOULIN {0,1,2} formé !
+# Attendu : phase = PHASE_CAPTURE
+#           reachableCells = positions blanches NON en moulin
+2
+
+# Blanc a 3 et 4. Blanc n'a pas encore de moulin → les deux sont capturables.
+# Noir tente de capturer un pion en moulin (ici aucun moulin blanc, donc tout est OK)
+# Noir capture le pion blanc en 4
+4
+
+# Retour PLACEMENT. C'est au tour de Blanc.
+# Tour 4 — Blanc : 5 | Noir : 9
+5
+9
+
+# Tour 5 — Blanc : 18 | Noir : 10
+18
+10
+
+# Tour 6 — Blanc : 19 | Noir : 11
+# Blanc a 3,5,18,19 → si blanc joue 20 il forme {18,19,20}
+# Pour l'instant pas encore de moulin blanc
+19
+11
+
+# ===== Test : Blanc forme le moulin {3,4,5} mais 4 a été capturé !
+# Blanc n'a que 3,5 sur cette ligne → PAS de moulin ici
+# Tour 7 — Blanc : 20  → MOULIN {18,19,20} formé !
+# Attendu : phase = PHASE_CAPTURE
+20
+
+# Blanc doit capturer. Noir a des pions en 0,1,2,9,10,11
+# Pions noirs en moulin : {0,1,2} et {9,10,11}
+# Tous les noirs sont en moulin → tous capturables (règle spéciale)
+# Blanc capture le pion noir en 2
+2
+
+# ===== Test : tentative de capture d'un pion protégé quand d'autres existent
+# (Cas où blanc essaierait de capturer en moulin alors que des libres existent)
+# Ici les noirs libres : 0, 1 (pas en moulin {0,1,2} car 2 retiré)
+# Ce test doit être géré dans le prochain cycle.
+
+# Tour 8 — Noir : 21 | Blanc : 6
+21
+6
+
+# Tour 9 — Noir : 22 | Blanc : 7
+22
+7
+
+# Tour 10 — Noir : 23 → MOULIN {21,22,23} formé !
+23
+
+# Noir capture. Blanc a 3,5,6,7,18,19,20 sur le board.
+# Blanc en moulin : {18,19,20} → NON capturables si d'autres disponibles
+# Blanc hors moulin : 3,5,6,7 → tous capturables
+# Test : tentative de capture du pion blanc en 18 (en moulin) → REFUS attendu
+18
+# Attendu : ">> Error: cannot capture pawn at 18 (protected by mill...)"
+# Noir capture alors le pion en 3
+3
+
+# Fin de séquence — vérifier que le jeu continue normalement
+# Tour 11 — Blanc : 8 | Noir : 13
+8
+13
+stop

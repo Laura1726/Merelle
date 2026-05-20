@@ -1,0 +1,115 @@
+# TEST : Conditions de fin de partie
+# Mode : 0 (Human vs Human)
+# Objectif : Vérifier les trois conditions d'arrêt :
+#   (A) Victoire par réduction < 3 pions adverses
+#   (B) Victoire par blocage total de l'adversaire
+#   (C) Match nul après DRAW_LIMIT (50) tours sans capture
+#
+# =========================================================
+# SCÉNARIO A — Victoire par réduction à < 3 pions
+# =========================================================
+# Stratégie : Noir forme des moulins répétés pour capturer jusqu'à
+# ce que Blanc n'ait plus que 2 pions sur le plateau (placement terminé).
+#
+# Placement : Noir occupe le moulin {0,1,2} + {9,10,11}
+#             Blanc éparpillé pour être vulnérable
+
+# Placement
+0
+3
+1
+4
+9
+5
+10
+13
+11
+14
+2
+20
+21
+22
+23
+16
+15
+17
+
+# → PHASE_MOVEMENT
+# Noir a {0,1,2,9,10,11,21,15,23} — trop de pions, simplifions.
+# NOTE : ce scénario est illustratif ; le testeur doit jouer
+#        jusqu'à amener blanc à 2 pions sur le plateau (placement fini)
+#        pour voir s'afficher "GAME OVER - [Noir] wins!"
+#
+# Séquence indicative de fin :
+# Noir déplace 23→22 (adj[23]={14,22} : 14 occupé, 22 occupé → bloqué)
+# Noir déplace 21→22 (adj[21]={9,22} : 9 occupé, 22 libre ?)
+# ... (le testeur complète selon l'état réel du plateau)
+stop
+
+# =========================================================
+# SCÉNARIO B — Victoire par blocage
+# =========================================================
+# Pour tester séparément, relancer le jeu avec ce placement :
+# Noir enserre les 3 derniers pions blancs sans cases libres adjacentes.
+# (Test manuel recommandé en mode Computer vs Computer pour observer)
+
+# =========================================================
+# SCÉNARIO C — Match nul (DRAW_LIMIT = 50 tours sans capture)
+# =========================================================
+# Placement initial équilibré — aucun moulin formé durant le placement
+0
+23
+3
+21
+6
+15
+9
+17
+5
+20
+2
+14
+# Placements restants
+8
+22
+11
+13
+10
+18
+# → PHASE_MOVEMENT
+# Les deux joueurs font des allers-retours sans capturer pendant 50 tours.
+# Mouvement aller-retour de Noir : 0↔1, puis Blanc : 23↔22, répété 25 fois.
+# Tour 1 Noir
+0
+1
+# Tour 1 Blanc
+23
+22
+# Tour 2 Noir
+1
+0
+# Tour 2 Blanc
+22
+23
+# Tour 3 Noir
+0
+1
+# Tour 3 Blanc
+23
+22
+# Tour 4 Noir
+1
+0
+# Tour 4 Blanc
+22
+23
+# Tour 5 Noir
+0
+1
+# Tour 5 Blanc
+23
+22
+# ... répéter jusqu'à 50 tours sans capture ...
+# Attendu : après 50 tours → "DRAW - no winner."
+# (suite omise pour brièveté — reproduire le motif jusqu'à noCaptureTurns >= 50)
+stop

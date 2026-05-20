@@ -1,0 +1,66 @@
+# TEST : Placement basique (Human vs Human)
+# Mode : 0 (Human vs Human)
+# Objectif : Vérifier que les 9 pions noirs et 9 blancs se placent correctement
+#            sur le plateau sans erreur, et que la transition vers MOVEMENT se fait.
+#
+# Format : chaque ligne = saisie d'un joueur (alternativement noir puis blanc)
+# Les commentaires (#) ne sont PAS des entrées ; ils décrivent l'état attendu.
+
+# --- Tour 1 : Noir place en 0, Blanc place en 23 ---
+# Attendu : pion B en position 0, pion W en position 23
+0
+23
+
+# --- Tour 2 : Noir place en 1, Blanc place en 22 ---
+1
+22
+
+# --- Tour 3 : Noir place en 2, Blanc place en 21 ---
+# Attendu : PAS de moulin (0-1-2 formeraient un moulin seulement si 3 alignés)
+# Ici après ce coup : noir a 0,1,2 → MOULIN 0-1-2 → phase CAPTURE attendue
+2
+
+# --- Noir doit capturer un pion blanc ---
+# Blanc a des pions en 23, 22, 21 ; aucun n'est en moulin → tous capturables
+# Noir choisit de capturer le pion en 23
+23
+
+# --- Blanc continue son placement ---
+21
+
+# --- Tour 4 ---
+# Noir place en 9, Blanc en 14
+9
+14
+
+# --- Tour 5 ---
+# Noir place en 3, Blanc en 5
+3
+5
+
+# --- Tour 6 ---
+# Noir place en 6, Blanc en 8
+6
+8
+
+# --- Tour 7 ---
+# Noir place en 15, Blanc en 17
+15
+17
+
+# --- Tour 8 ---
+# Noir place en 18, Blanc en 20
+18
+20
+
+# --- Tour 9 (dernier placement) ---
+# Noir place en 21, Blanc en 16
+21
+16
+
+# Attendu après ce dernier placement :
+#   blackPawnsToPlace = 0, whitePawnsToPlace = 0
+#   → transition automatique vers PHASE_MOVEMENT
+#   Aucun vainqueur à ce stade.
+
+stop
